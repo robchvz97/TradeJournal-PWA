@@ -59,10 +59,10 @@ textarea{min-height:64px}
 .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .dow{text-align:center;font-size:11px;color:var(--muted);padding:4px 0}
-.day{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;padding:0}
+.day{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;padding:2px 0 0;line-height:1.1}
 .day.green{background:#12352c;border-color:#2e8f73;color:var(--mint)}
 .day.red{background:#3a1520;border-color:#8a3a48;color:var(--red)}
-.day .pnl{font-size:9px;font-weight:700}
+.day .pnl{font-size:9px;font-weight:700;margin-top:2px}
 .shot{display:grid;gap:6px}
 </style>
 </head>
@@ -97,8 +97,10 @@ textarea{min-height:64px}
 <strong id="calTitle"></strong>
 <button class="ghost" id="nextM" type="button">›</button>
 </div>
+<label class="label" for="acctSize">Tamaño de cuenta (USD)</label>
+<input id="acctSize" type="number" step="1" min="1" placeholder="Ej. 10000" style="margin:6px 0 12px">
 <div class="cal-grid" id="calGrid"></div>
-<p class="hint" style="margin-top:12px">Verde = día positivo. Rojo = día negativo. Transparente = sin operaciones.</p>
+<p class="hint" style="margin-top:12px">Verde = día positivo. Rojo = día negativo. Transparente = sin operaciones. El porcentaje es el resultado del día sobre el tamaño de cuenta.</p>
 </div>
 </div>
 <button class="fab" id="addBtn" type="button">+</button>
@@ -156,6 +158,8 @@ function saveTrade(tr){return new Promise((res,rej)=>{const t=db.transaction(STO
 function deleteTrade(id){return new Promise((res,rej)=>{const t=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id);t.onsuccess=()=>res();t.onerror=()=>rej(t.error)})}
 function compress(file){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const max=1000,s=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',0.7))};img.src=url})}
 function money(n){const v=Number(n)||0;return (v>=0?'+':'')+v.toFixed(2)}
+function accountSize(){const n=Number(localStorage.getItem('tj_account')||10000);return n>0?n:10000}
+function pct(n,base){if(!base)return '';const p=100*Number(n)/base;return (p>=0?'+':'')+p.toFixed(2)+'%'}
 function dayKey(t){return (t.closed||t.opened||'').slice(0,10)}
 function setPreview(el,data){if(data){el.src=data;el.style.display='block'}else{el.src='';el.style.display='none'}}
 async function render(){
@@ -185,6 +189,9 @@ function renderCal(trades){
   const y=calCursor.getFullYear(),m=calCursor.getMonth();
   const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('calTitle').textContent=months[m]+' '+y;
+  const size=accountSize();
+  const acct=document.getElementById('acctSize');
+  if(acct&&document.activeElement!==acct) acct.value=size;
   const byDay={};
   trades.forEach(t=>{const k=dayKey(t);if(!k)return;byDay[k]=(byDay[k]||0)+Number(t.net||0)});
   const first=new Date(y,m,1),start=(first.getDay()+6)%7,daysIn=new Date(y,m+1,0).getDate();
@@ -194,8 +201,9 @@ function renderCal(trades){
     const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     let cls='day',extra='';
     if(key in byDay){
-      if(byDay[key]>0){cls+=' green';extra=`<span class="pnl">${money(byDay[key])}</span>`}
-      else if(byDay[key]<0){cls+=' red';extra=`<span class="pnl">${money(byDay[key])}</span>`}
+      if(byDay[key]>0) cls+=' green';
+      else if(byDay[key]<0) cls+=' red';
+      extra=`<span class="pnl">${pct(byDay[key],size)}</span>`;
     }
     html+=`<button type="button" class="${cls}">${d}${extra}</button>`;
   }
@@ -220,6 +228,7 @@ document.querySelectorAll('.tabs button').forEach(btn=>{
 });
 document.getElementById('prevM').onclick=()=>{calCursor.setMonth(calCursor.getMonth()-1);allTrades().then(renderCal)};
 document.getElementById('nextM').onclick=()=>{calCursor.setMonth(calCursor.getMonth()+1);allTrades().then(renderCal)};
+document.getElementById('acctSize').onchange=()=>{localStorage.setItem('tj_account',document.getElementById('acctSize').value||'10000');allTrades().then(renderCal)};
 document.getElementById('addBtn').onclick=()=>openForm();
 document.getElementById('cancelBtn').onclick=()=>document.getElementById('modal').close();
 document.getElementById('refreshBtn').onclick=async()=>{const b=document.getElementById('refreshBtn');b.classList.add('spin');await render();setTimeout(()=>b.classList.remove('spin'),600)};
