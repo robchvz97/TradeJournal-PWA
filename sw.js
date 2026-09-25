@@ -1,4 +1,4 @@
-const CACHE = 'tradejournal-v1';
+const CACHE = 'tradejournal-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -11,10 +11,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request).then((res) => {
+    fetch(event.request).then((res) => {
       const copy = res.clone();
       caches.open(CACHE).then((c) => c.put(event.request, copy));
       return res;
-    }).catch(() => cached))
+    }).catch(() => caches.match(event.request))
   );
 });
