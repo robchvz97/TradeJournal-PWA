@@ -1,285 +1,233 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b101a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TradeJournal">
-  <title>TradeJournal</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="icon" href="icon.svg">
-  <style>
-    :root {
-      --bg: #0b101a;
-      --card: #121a28;
-      --line: #1e2a3d;
-      --mint: #59ddb0;
-      --red: #ff6b7a;
-      --text: #e8eef7;
-      --muted: #8b9bb3;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; }
-    body { padding: 16px 16px calc(88px + env(safe-area-inset-bottom)); max-width: 720px; margin: 0 auto; }
-    h1 { font-size: 22px; margin: 8px 0 4px; }
-    .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
-    .label { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-    .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
-    .pos { color: var(--mint); }
-    .neg { color: var(--red); }
-    .list { display: flex; flex-direction: column; gap: 10px; }
-    .trade { display: grid; grid-template-columns: 72px 1fr auto; gap: 12px; align-items: center; }
-    .thumb { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; background: #0b101a; border: 1px solid var(--line); }
-    .thumb.empty { display: grid; place-items: center; color: var(--muted); font-size: 11px; }
-    .sym { font-weight: 700; }
-    .meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
-    button, .btn {
-      appearance: none; border: 0; background: var(--mint); color: #06261c;
-      font-weight: 700; border-radius: 14px; padding: 12px 16px; font-size: 15px;
-    }
-    button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
-    button.danger { background: #3a1520; color: var(--red); }
-    .fab {
-      position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom));
-      width: 58px; height: 58px; border-radius: 50%; font-size: 28px; line-height: 1;
-      box-shadow: 0 10px 24px #0008;
-    }
-    dialog { border: 0; padding: 0; background: transparent; width: min(100%, 560px); }
-    dialog::backdrop { background: #000a; }
-    .sheet { background: var(--card); border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); max-height: 92vh; overflow: auto; }
-    form { display: grid; gap: 10px; }
-    input, select, textarea {
-      width: 100%; background: #0b101a; color: var(--text); border: 1px solid var(--line);
-      border-radius: 12px; padding: 12px; font-size: 16px;
-    }
-    textarea { min-height: 72px; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .preview { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; display: none; }
-    .actions { display: flex; gap: 8px; }
-    .actions button { flex: 1; }
-    .empty { text-align: center; color: var(--muted); padding: 40px 12px; }
-    .toolbar { display: flex; gap: 8px; margin: 8px 0 16px; }
-    .toolbar button { flex: 1; font-size: 13px; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b101a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TradeJournal">
+<title>TradeJournal</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg">
+<style>
+:root{--bg:#0b101a;--card:#121a28;--line:#1e2a3d;--mint:#59ddb0;--red:#ff6b7a;--text:#e8eef7;--muted:#8b9bb3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+body{padding:16px 16px calc(88px + env(safe-area-inset-bottom));max-width:720px;margin:0 auto}
+h1{font-size:22px;margin:8px 0 4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.value{font-size:22px;font-weight:700;margin-top:4px}
+.pos{color:var(--mint)}.neg{color:var(--red)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tabs button{flex:1}
+.tabs button.on{background:var(--mint);color:#06261c}
+.list{display:flex;flex-direction:column;gap:10px}
+.trade{display:grid;grid-template-columns:72px 1fr auto;gap:12px;align-items:center}
+.thumbs{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:72px}
+.thumb{width:100%;height:34px;border-radius:8px;object-fit:cover;background:#0b101a;border:1px solid var(--line)}
+.thumb.empty{display:grid;place-items:center;color:var(--muted);font-size:9px;height:34px}
+.sym{font-weight:700}
+.meta{font-size:12px;color:var(--muted);margin-top:3px}
+button{appearance:none;border:0;background:var(--mint);color:#06261c;font-weight:700;border-radius:14px;padding:12px 16px;font-size:15px}
+button.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+button.danger{background:#3a1520;color:var(--red);width:100%}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;font-size:28px;box-shadow:0 10px 24px #0008;z-index:5}
+dialog{border:0;padding:0;background:transparent;width:min(100%,560px)}
+dialog::backdrop{background:#000a}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+form{display:grid;gap:10px}
+input,select,textarea{width:100%;background:#0b101a;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:16px}
+textarea{min-height:64px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.preview{width:100%;max-height:140px;object-fit:cover;border-radius:12px;display:none}
+.actions{display:flex;gap:8px}
+.actions button{flex:1}
+.empty{text-align:center;color:var(--muted);padding:40px 12px}
+.toolbar{display:flex;gap:8px;margin:8px 0 16px}
+.toolbar button{flex:1;font-size:13px}
+.hint{font-size:12px;color:var(--muted)}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{text-align:center;font-size:11px;color:var(--muted);padding:4px 0}
+.day{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;padding:0}
+.day.green{background:#12352c;border-color:#2e8f73;color:var(--mint)}
+.day.red{background:#3a1520;border-color:#8a3a48;color:var(--red)}
+.day .pnl{font-size:9px;font-weight:700}
+.shot{display:grid;gap:6px}
+</style>
 </head>
 <body>
-  <h1>TradeJournal</h1>
-  <div class="sub">Tus operaciones. Tus fotos. Guardado en este dispositivo.</div>
-  <div class="stats">
-    <div class="card"><div class="label">Resultado neto</div><div class="value" id="net">0.00</div></div>
-    <div class="card"><div class="label">Win rate</div><div class="value" id="wr">—</div></div>
-    <div class="card"><div class="label">Cerradas</div><div class="value" id="count">0</div></div>
-    <div class="card"><div class="label">Profit factor</div><div class="value" id="pf">—</div></div>
-  </div>
-  <div class="toolbar">
-    <button class="ghost" id="exportBtn" type="button">Exportar</button>
-    <button class="ghost" id="importBtn" type="button">Importar</button>
-    <input id="importFile" type="file" accept="application/json" hidden>
-  </div>
-  <div id="list" class="list"></div>
-  <button class="fab" id="addBtn" type="button">+</button>
-
-  <dialog id="modal">
-    <div class="sheet">
-      <h2 id="formTitle" style="margin-top:0">Nueva operación</h2>
-      <form id="form">
-        <input type="hidden" name="id">
-        <div class="row">
-          <input name="symbol" placeholder="Par · GBPJPY" required>
-          <select name="side">
-            <option value="BUY">BUY</option>
-            <option value="SELL">SELL</option>
-          </select>
-        </div>
-        <div class="row">
-          <input name="volume" type="number" step="0.01" placeholder="Volumen" required>
-          <input name="net" type="number" step="0.01" placeholder="Resultado (USD)" required>
-        </div>
-        <div class="row">
-          <input name="entry" type="number" step="any" placeholder="Entrada">
-          <input name="exit" type="number" step="any" placeholder="Salida">
-        </div>
-        <div class="row">
-          <input name="opened" type="datetime-local">
-          <input name="closed" type="datetime-local">
-        </div>
-        <textarea name="note" placeholder="Nota, setup, error…"></textarea>
-        <input id="photo" type="file" accept="image/*">
-        <img id="preview" class="preview" alt="">
-        <div class="actions">
-          <button type="submit">Guardar</button>
-          <button type="button" class="ghost" id="cancelBtn">Cancelar</button>
-        </div>
-        <button type="button" class="danger" id="deleteBtn" hidden>Eliminar</button>
-      </form>
-    </div>
-  </dialog>
-
-  <script>
-    const DB_NAME = 'tradejournal';
-    const STORE = 'trades';
-    let db, editing = null, photoData = null;
-
-    function openDb() {
-      return new Promise((resolve, reject) => {
-        const req = indexedDB.open(DB_NAME, 1);
-        req.onupgradeneeded = () => req.result.createObjectStore(STORE, { keyPath: 'id' });
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-      });
+<h1>TradeJournal</h1>
+<div class="sub">Foto de MT5 al abrir y al cerrar. Calendario del mes.</div>
+<div class="stats">
+<div class="card"><div class="label">Resultado neto</div><div class="value" id="net">0.00</div></div>
+<div class="card"><div class="label">Win rate</div><div class="value" id="wr">—</div></div>
+<div class="card"><div class="label">Cerradas</div><div class="value" id="count">0</div></div>
+<div class="card"><div class="label">Profit factor</div><div class="value" id="pf">—</div></div>
+</div>
+<div class="tabs">
+<button class="ghost on" data-tab="ops" type="button">Operaciones</button>
+<button class="ghost" data-tab="cal" type="button">Calendario</button>
+</div>
+<div id="opsView">
+<div class="toolbar">
+<button class="ghost" id="exportBtn" type="button">Exportar</button>
+<button class="ghost" id="importBtn" type="button">Importar</button>
+<input id="importFile" type="file" accept="application/json" hidden>
+</div>
+<div id="list" class="list"></div>
+</div>
+<div id="calView" hidden>
+<div class="card">
+<div class="cal-head">
+<button class="ghost" id="prevM" type="button">‹</button>
+<strong id="calTitle"></strong>
+<button class="ghost" id="nextM" type="button">›</button>
+</div>
+<div class="cal-grid" id="calGrid"></div>
+<p class="hint" style="margin-top:12px">Verde = día positivo. Rojo = día negativo. Transparente = sin operaciones.</p>
+</div>
+</div>
+<button class="fab" id="addBtn" type="button">+</button>
+<dialog id="modal">
+<div class="sheet">
+<h2 id="formTitle" style="margin-top:0">Nueva operación</h2>
+<form id="form">
+<input type="hidden" name="id">
+<div class="row">
+<div class="shot">
+<span class="label">Foto al abrir (MT5)</span>
+<input id="photoOpen" type="file" accept="image/*" capture="environment">
+<img id="prevOpen" class="preview" alt="">
+</div>
+<div class="shot">
+<span class="label">Foto al cerrar</span>
+<input id="photoClose" type="file" accept="image/*" capture="environment">
+<img id="prevClose" class="preview" alt="">
+</div>
+</div>
+<p class="hint">Toma la foto de la orden en MT5 (entrada, SL, TP, volumen). Cópialos en los campos.</p>
+<div class="row">
+<input name="symbol" placeholder="Par · GBPJPY" required>
+<select name="side"><option value="BUY">BUY</option><option value="SELL">SELL</option></select>
+</div>
+<div class="row3">
+<input name="volume" type="number" step="0.01" placeholder="Volumen" required>
+<input name="entry" type="number" step="any" placeholder="Entrada">
+<input name="exit" type="number" step="any" placeholder="Salida">
+</div>
+<div class="row3">
+<input name="sl" type="number" step="any" placeholder="Stop loss">
+<input name="tp" type="number" step="any" placeholder="Take profit">
+<input name="net" type="number" step="0.01" placeholder="Resultado USD" required>
+</div>
+<div class="row">
+<input name="opened" type="datetime-local">
+<input name="closed" type="datetime-local">
+</div>
+<textarea name="note" placeholder="Nota, setup, error…"></textarea>
+<div class="actions">
+<button type="submit">Guardar</button>
+<button type="button" class="ghost" id="cancelBtn">Cancelar</button>
+</div>
+<button type="button" class="danger" id="deleteBtn" hidden>Eliminar</button>
+</form>
+</div>
+</dialog>
+<script>
+const DB_NAME='tradejournal',STORE='trades';
+let db,editing=null,photoOpen=null,photoClose=null,calCursor=new Date();
+function openDb(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function allTrades(){return new Promise((res,rej)=>{const t=db.transaction(STORE,'readonly').objectStore(STORE).getAll();t.onsuccess=()=>res(t.result.sort((a,b)=>dayKey(b).localeCompare(dayKey(a))));t.onerror=()=>rej(t.error)})}
+function saveTrade(tr){return new Promise((res,rej)=>{const t=db.transaction(STORE,'readwrite').objectStore(STORE).put(tr);t.onsuccess=()=>res();t.onerror=()=>rej(t.error)})}
+function deleteTrade(id){return new Promise((res,rej)=>{const t=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id);t.onsuccess=()=>res();t.onerror=()=>rej(t.error)})}
+function compress(file){return new Promise(res=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{const max=1000,s=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',0.7))};img.src=url})}
+function money(n){const v=Number(n)||0;return (v>=0?'+':'')+v.toFixed(2)}
+function dayKey(t){return (t.closed||t.opened||'').slice(0,10)}
+function setPreview(el,data){if(data){el.src=data;el.style.display='block'}else{el.src='';el.style.display='none'}}
+async function render(){
+  const trades=await allTrades();
+  const closed=trades.filter(t=>t.net!==''&&t.net!=null);
+  const net=closed.reduce((s,t)=>s+Number(t.net),0);
+  const wins=closed.filter(t=>Number(t.net)>0);
+  const gain=wins.reduce((s,t)=>s+Number(t.net),0);
+  const loss=Math.abs(closed.filter(t=>Number(t.net)<0).reduce((s,t)=>s+Number(t.net),0));
+  document.getElementById('net').textContent=money(net)+' USD';
+  document.getElementById('net').className='value '+(net>=0?'pos':'neg');
+  document.getElementById('count').textContent=closed.length;
+  document.getElementById('wr').textContent=closed.length?(100*wins.length/closed.length).toFixed(1)+'%':'—';
+  document.getElementById('pf').textContent=loss?(gain/loss).toFixed(2):(gain?'∞':'—');
+  const list=document.getElementById('list');
+  if(!trades.length){list.innerHTML='<div class="empty">Aún no hay operaciones.<br>Pulsa + y toma la foto de MT5.</div>'}
+  else{
+    list.innerHTML=trades.map(t=>{
+      const o=t.photoOpen||t.photo,c=t.photoClose;
+      return `<article class="card trade" data-id="${t.id}"><div class="thumbs">${o?`<img class="thumb" src="${o}" alt="">`:`<div class="thumb empty">abrir</div>`}${c?`<img class="thumb" src="${c}" alt="">`:`<div class="thumb empty">cerrar</div>`}</div><div><div class="sym">${t.side} ${t.symbol}</div><div class="meta">${t.volume||''} · SL ${t.sl||'—'} · TP ${t.tp||'—'}</div><div class="meta">${dayKey(t)||'sin fecha'}</div></div><div class="value ${Number(t.net)>=0?'pos':'neg'}">${money(t.net)}</div></article>`
+    }).join('');
+    list.querySelectorAll('.trade').forEach(el=>el.onclick=()=>openForm(trades.find(t=>t.id===el.dataset.id)));
+  }
+  renderCal(trades);
+}
+function renderCal(trades){
+  const y=calCursor.getFullYear(),m=calCursor.getMonth();
+  const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('calTitle').textContent=months[m]+' '+y;
+  const byDay={};
+  trades.forEach(t=>{const k=dayKey(t);if(!k)return;byDay[k]=(byDay[k]||0)+Number(t.net||0)});
+  const first=new Date(y,m,1),start=(first.getDay()+6)%7,daysIn=new Date(y,m+1,0).getDate();
+  let html=['L','M','X','J','V','S','D'].map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<start;i++) html+='<div></div>';
+  for(let d=1;d<=daysIn;d++){
+    const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls='day',extra='';
+    if(key in byDay){
+      if(byDay[key]>0){cls+=' green';extra=`<span class="pnl">${money(byDay[key])}</span>`}
+      else if(byDay[key]<0){cls+=' red';extra=`<span class="pnl">${money(byDay[key])}</span>`}
     }
-    function allTrades() {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE, 'readonly').objectStore(STORE).getAll();
-        tx.onsuccess = () => resolve(tx.result.sort((a,b) => (b.closed || b.opened || '').localeCompare(a.closed || a.opened || '')));
-        tx.onerror = () => reject(tx.error);
-      });
-    }
-    function saveTrade(trade) {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE, 'readwrite').objectStore(STORE).put(trade);
-        tx.onsuccess = () => resolve();
-        tx.onerror = () => reject(tx.error);
-      });
-    }
-    function deleteTrade(id) {
-      return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE, 'readwrite').objectStore(STORE).delete(id);
-        tx.onsuccess = () => resolve();
-        tx.onerror = () => reject(tx.error);
-      });
-    }
-    function compress(file) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        img.onload = () => {
-          const max = 900;
-          const scale = Math.min(1, max / Math.max(img.width, img.height));
-          const c = document.createElement('canvas');
-          c.width = Math.round(img.width * scale);
-          c.height = Math.round(img.height * scale);
-          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-          URL.revokeObjectURL(url);
-          resolve(c.toDataURL('image/jpeg', 0.72));
-        };
-        img.src = url;
-      });
-    }
-    function money(n) {
-      const v = Number(n) || 0;
-      return (v >= 0 ? '+' : '') + v.toFixed(2);
-    }
-    async function render() {
-      const trades = await allTrades();
-      const closed = trades.filter(t => t.net !== '' && t.net != null);
-      const net = closed.reduce((s,t) => s + Number(t.net), 0);
-      const wins = closed.filter(t => Number(t.net) > 0);
-      const gain = wins.reduce((s,t) => s + Number(t.net), 0);
-      const loss = -closed.filter(t => Number(t.net) < 0).reduce((s,t) => s + Number(t.net), 0);
-      document.getElementById('net').textContent = money(net) + ' USD';
-      document.getElementById('net').className = 'value ' + (net >= 0 ? 'pos' : 'neg');
-      document.getElementById('count').textContent = closed.length;
-      document.getElementById('wr').textContent = closed.length ? (100 * wins.length / closed.length).toFixed(1) + '%' : '—';
-      document.getElementById('pf').textContent = loss ? (gain / loss).toFixed(2) : (gain ? '∞' : '—');
-      const list = document.getElementById('list');
-      if (!trades.length) {
-        list.innerHTML = '<div class="empty">Aún no hay operaciones.<br>Pulsa + para agregar la primera.</div>';
-        return;
-      }
-      list.innerHTML = trades.map(t => `
-        <article class="card trade" data-id="${t.id}">
-          ${t.photo ? `<img class="thumb" src="${t.photo}" alt="">` : `<div class="thumb empty">sin foto</div>`}
-          <div>
-            <div class="sym">${t.side} ${t.symbol}</div>
-            <div class="meta">${t.volume || ''} · ${t.closed ? t.closed.replace('T',' ').slice(0,16) : 'sin cierre'}</div>
-            <div class="meta">${t.note ? t.note.slice(0,80) : ''}</div>
-          </div>
-          <div class="value ${Number(t.net) >= 0 ? 'pos' : 'neg'}">${money(t.net)}</div>
-        </article>
-      `).join('');
-      list.querySelectorAll('.trade').forEach(el => el.onclick = () => openForm(trades.find(t => t.id === el.dataset.id)));
-    }
-    function openForm(trade) {
-      editing = trade || null;
-      photoData = trade && trade.photo || null;
-      const form = document.getElementById('form');
-      form.reset();
-      document.getElementById('formTitle').textContent = trade ? 'Editar operación' : 'Nueva operación';
-      document.getElementById('deleteBtn').hidden = !trade;
-      const preview = document.getElementById('preview');
-      if (photoData) { preview.src = photoData; preview.style.display = 'block'; }
-      else { preview.style.display = 'none'; preview.src = ''; }
-      if (trade) {
-        for (const [k,v] of Object.entries(trade)) {
-          if (form.elements[k] && k !== 'photo') form.elements[k].value = v ?? '';
-        }
-      } else {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        form.elements.closed.value = now.toISOString().slice(0,16);
-      }
-      document.getElementById('modal').showModal();
-    }
-    document.getElementById('addBtn').onclick = () => openForm();
-    document.getElementById('cancelBtn').onclick = () => document.getElementById('modal').close();
-    document.getElementById('photo').onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      photoData = await compress(file);
-      const preview = document.getElementById('preview');
-      preview.src = photoData;
-      preview.style.display = 'block';
-    };
-    document.getElementById('form').onsubmit = async (e) => {
-      e.preventDefault();
-      const f = e.target;
-      const trade = {
-        id: f.id.value || crypto.randomUUID(),
-        symbol: f.symbol.value.trim().toUpperCase(),
-        side: f.side.value,
-        volume: f.volume.value,
-        net: f.net.value,
-        entry: f.entry.value,
-        exit: f.exit.value,
-        opened: f.opened.value,
-        closed: f.closed.value,
-        note: f.note.value,
-        photo: photoData
-      };
-      await saveTrade(trade);
-      document.getElementById('modal').close();
-      render();
-    };
-    document.getElementById('deleteBtn').onclick = async () => {
-      if (!editing || !confirm('¿Eliminar esta operación?')) return;
-      await deleteTrade(editing.id);
-      document.getElementById('modal').close();
-      render();
-    };
-    document.getElementById('exportBtn').onclick = async () => {
-      const trades = await allTrades();
-      const blob = new Blob([JSON.stringify(trades)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'tradejournal-backup.json';
-      a.click();
-    };
-    document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
-    document.getElementById('importFile').onchange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const trades = JSON.parse(await file.text());
-      for (const t of trades) await saveTrade(t);
-      render();
-    };
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
-    openDb().then((d) => { db = d; render(); });
-  </script>
+    html+=`<button type="button" class="${cls}">${d}${extra}</button>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+}
+function openForm(trade){
+  editing=trade||null;
+  photoOpen=(trade&&(trade.photoOpen||trade.photo))||null;
+  photoClose=(trade&&trade.photoClose)||null;
+  const form=document.getElementById('form');
+  form.reset();
+  document.getElementById('formTitle').textContent=trade?'Editar operación':'Nueva operación';
+  document.getElementById('deleteBtn').hidden=!trade;
+  setPreview(document.getElementById('prevOpen'),photoOpen);
+  setPreview(document.getElementById('prevClose'),photoClose);
+  if(trade){for(const [k,v] of Object.entries(trade)){if(form.elements[k]) form.elements[k].value=v??''}}
+  else{const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());form.elements.opened.value=now.toISOString().slice(0,16);form.elements.closed.value=now.toISOString().slice(0,16)}
+  document.getElementById('modal').showModal();
+}
+document.querySelectorAll('.tabs button').forEach(btn=>{
+  btn.onclick=()=>{document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');const tab=btn.dataset.tab;document.getElementById('opsView').hidden=tab!=='ops';document.getElementById('calView').hidden=tab!=='cal'}
+});
+document.getElementById('prevM').onclick=()=>{calCursor.setMonth(calCursor.getMonth()-1);allTrades().then(renderCal)};
+document.getElementById('nextM').onclick=()=>{calCursor.setMonth(calCursor.getMonth()+1);allTrades().then(renderCal)};
+document.getElementById('addBtn').onclick=()=>openForm();
+document.getElementById('cancelBtn').onclick=()=>document.getElementById('modal').close();
+document.getElementById('photoOpen').onchange=async e=>{const f=e.target.files[0];if(!f)return;photoOpen=await compress(f);setPreview(document.getElementById('prevOpen'),photoOpen)};
+document.getElementById('photoClose').onchange=async e=>{const f=e.target.files[0];if(!f)return;photoClose=await compress(f);setPreview(document.getElementById('prevClose'),photoClose)};
+document.getElementById('form').onsubmit=async e=>{
+  e.preventDefault();const f=e.target;
+  await saveTrade({id:f.id.value||crypto.randomUUID(),symbol:f.symbol.value.trim().toUpperCase(),side:f.side.value,volume:f.volume.value,net:f.net.value,entry:f.entry.value,exit:f.exit.value,sl:f.sl.value,tp:f.tp.value,opened:f.opened.value,closed:f.closed.value,note:f.note.value,photoOpen,photoClose,photo:photoOpen});
+  document.getElementById('modal').close();render();
+};
+document.getElementById('deleteBtn').onclick=async()=>{if(!editing||!confirm('¿Eliminar esta operación?'))return;await deleteTrade(editing.id);document.getElementById('modal').close();render()};
+document.getElementById('exportBtn').onclick=async()=>{const trades=await allTrades();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(trades)],{type:'application/json'}));a.download='tradejournal-backup.json';a.click()};
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;for(const t of JSON.parse(await file.text())) await saveTrade(t);render()};
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+openDb().then(d=>{db=d;render()});
+</script>
 </body>
 </html>
