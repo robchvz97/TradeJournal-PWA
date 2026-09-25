@@ -1,4 +1,4 @@
-const CACHE = 'tradejournal-v3';
+const CACHE = 'tradejournal-v4';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon.svg'];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
